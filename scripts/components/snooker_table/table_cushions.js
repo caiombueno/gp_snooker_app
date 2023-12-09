@@ -25,7 +25,7 @@ class TableCushions {
 
         const verticalCushionWidth = tableHeight - (2 * pocketDiameter);
 
-        const horizontalCushionOptions = { isStatic: true };
+        const horizontalCushionOptions = { isStatic: true, restitution: 1 };
 
         const verticalCushionOptions = { isStatic: true, angle: Math.PI / 2 };
 

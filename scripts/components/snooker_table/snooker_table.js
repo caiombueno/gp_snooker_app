@@ -1,22 +1,22 @@
 class SnookerTable {
     #xPos;
     #yPos;
-    #width;
-    #height;
+    width;
+    height;
     #railThickness;
     #tablePockets;
     #tableCushions;
 
-    constructor(xPos, yPos, width, world) {
+    constructor(xPos, yPos, width, height) {
         this.#xPos = xPos;
         this.#yPos = yPos;
-        this.#width = width;
-        this.#height = width / 2;
-        this.#railThickness = 8;
-        const pocketDiameter = (this.#height / 36) * 1.5;
-        this.#tablePockets = new TablePockets(xPos, yPos, width, this.#height, pocketDiameter);
+        this.width = width;
+        this.height = height;
+        this.#railThickness = 10;
+        const pocketDiameter = (this.height / 36) * 1.5;
+        this.#tablePockets = new TablePockets(xPos, yPos, width, height, pocketDiameter);
 
-        this.#tableCushions = new TableCushions(xPos, yPos, width, this.#height, this.#railThickness, pocketDiameter);
+        this.#tableCushions = new TableCushions(xPos, yPos, width, height, this.#railThickness, pocketDiameter);
     }
 
     draw() {
@@ -24,7 +24,7 @@ class SnookerTable {
         fill(80, 140, 52);
         stroke(72, 36, 12);
         strokeWeight(this.#railThickness);
-        rect(this.#xPos, this.#yPos, this.#width, this.#height, 5);
+        rect(this.#xPos, this.#yPos, this.width, this.height, 5);
         pop();
 
         this.#drawWhiteLines();
@@ -35,10 +35,10 @@ class SnookerTable {
 
     #drawWhiteLines() {
         push();
-        const lineXPos = this.#xPos + this.#width * 0.25;
+        const lineXPos = this.#xPos + this.width * 0.25;
         const lineStartYPos = this.#yPos + this.#railThickness;
-        const lineEndYPos = this.#yPos + this.#height - this.#railThickness;
-        const centerYPos = this.#yPos + this.#height * 0.5
+        const lineEndYPos = this.#yPos + this.height - this.#railThickness;
+        const centerYPos = this.#yPos + this.height * 0.5
 
         stroke(255);
         line(lineXPos, lineStartYPos, lineXPos, lineEndYPos);
