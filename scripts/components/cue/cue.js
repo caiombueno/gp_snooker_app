@@ -1,7 +1,7 @@
 class Cue {
-    constructor(width) {
+    constructor(width, cueBallRadius) {
         const cueDistance = 5;
-        this.cueBallRadiusWithDistance = cueBall.circleRadius + cueDistance;
+        this.cueBallRadiusWithDistance = cueBallRadius + cueDistance;
         this.cueStickWidth = width - this.cueBallRadiusWithDistance;
         this.cueTipWidth = 5;
         this.cueHeight = 5;

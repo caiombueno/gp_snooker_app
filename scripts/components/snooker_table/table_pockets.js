@@ -1,5 +1,5 @@
 class TablePockets {
-    #pockets; // private member
+    #bodies;
 
     constructor(xPos, yPos, tableWidth, tableHeight, pocketDiameter) {
 
@@ -19,16 +19,20 @@ class TablePockets {
 
         const bottomMiddlePocket = Bodies.circle(xPos + tableWidth / 2, yPos + tableHeight - pocketRadius, pocketRadius, options);
 
-        this.#pockets = [topLeftPocket, topRightPocket, bottomRightPocket, bottomLeftPocket, topMiddlePocket, bottomMiddlePocket];
+        this.#bodies = [topLeftPocket, topRightPocket, bottomRightPocket, bottomLeftPocket, topMiddlePocket, bottomMiddlePocket];
 
-        World.add(engine.world, this.#pockets);
+        World.add(engine.world, this.#bodies);
+    }
+
+    isBodyACushion(body) {
+        return this.#bodies.includes(body);
     }
 
     draw() {
         push();
         fill(0);
-        for (let i = 0; i < this.#pockets.length; i++) {
-            drawVertices(this.#pockets[i].vertices);
+        for (let i = 0; i < this.#bodies.length; i++) {
+            drawVertices(this.#bodies[i].vertices);
         }
         pop();
     }

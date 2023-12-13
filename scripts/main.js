@@ -3,6 +3,7 @@ const {
   Engine,
   Render,
   World,
+  Composite,
   Body,
   Bodies,
   Mouse,
@@ -18,12 +19,16 @@ var snookerTable;
 
 var cueBall;
 
+var ballRadius;
+
+var objectBalls;
+
 var cue;
 
 var mouseConstraint;
 
 function setupSnookerTable() {
-  const snookerTableWidth = 700;
+  const snookerTableWidth = 1000;
   const snookerTableHeight = snookerTableWidth / 2;
   const canvasCenterX = width / 2;
   const canvasCenterY = height / 2;
@@ -31,24 +36,53 @@ function setupSnookerTable() {
   snookerTable = new SnookerTable(snookerTableX, canvasCenterY - snookerTableHeight / 2, snookerTableWidth, snookerTableHeight);
 }
 
-function setupCollisionDetection() {
-  Events.on(engine, 'collisionStart', (event) => {
-    event.pairs.forEach((collision) => {
-      if (collision.bodyA === cueBall || collision.bodyB === cueBall) {
-        console.log('Collision detected!');
-      }
-    });
-  });
-}
-
 function disableGravity() {
   engine.world.gravity.x = 0;
   engine.world.gravity.y = 0;
 }
 
-function setUpCueBall() {
-  const ballRadius = (snookerTable.width / 36) / 2;
-  cueBall = Bodies.circle(300, snookerTable.height + 30, ballRadius, { restitution: 1, friction: 0.0 });
+function addPositionModeEventListener() {
+  const form = document.getElementById('balls_position_form');
+  form.addEventListener('change', function () {
+    const startingPositionsRadio = document.getElementById('starting_positions');
+    const randomRedsOnlyRadio = document.getElementById('random_reds_only');
+    const randomRedsAndColouredRadio = document.getElementById('random_reds_and_coloured');
+
+    if (startingPositionsRadio.checked) {
+      changePositionMode(startingPositionsRadio.value);
+    } else if (randomRedsOnlyRadio.checked) {
+      changePositionMode(randomRedsOnlyRadio.value);
+    } else if (randomRedsAndColouredRadio.checked) {
+      changePositionMode(randomRedsAndColouredRadio.value);
+    }
+  });
+}
+
+function changePositionMode(positionMode) {
+  cueBall.removeFromWorld();
+  setupCueBall();
+
+  objectBalls.changeMode(positionMode);
+}
+
+function setupCueBall() {
+  cueBall = new CueBall(
+    snookerTable.arcProperties.x - 30,
+    snookerTable.arcProperties.y,
+    ballRadius,
+  );
+}
+
+function setupBalls() {
+  ballRadius = snookerTable.width / 72 * 0.5;
+
+  setupCueBall();
+
+  objectBalls = new ObjectBalls({
+    playFieldDimensions: snookerTable.playFieldDimensions,
+    arcProperties: snookerTable.arcProperties,
+    ballRadius: ballRadius,
+  });
 }
 
 function setup() {
@@ -56,7 +90,9 @@ function setup() {
 
   engine = Engine.create();
 
-  disableGravity()
+  disableGravity();
+
+  addPositionModeEventListener();
 
   // mouse constraint
   var mouse = Mouse.create(canvas.elt);
@@ -65,14 +101,16 @@ function setup() {
 
   setupSnookerTable();
 
-  setUpCueBall();
+  setupBalls();
 
-  // cue
-  cue = new CueController(cueBall);
+  new SnookerCollisionDetector({
+    pockets: snookerTable.pockets,
+    objectBalls: objectBalls,
+    cueBall: cueBall,
+    cushions: snookerTable.cushions,
+  });
 
-  World.add(engine.world, [cueBall, mouseConstraint]);
-
-  setupCollisionDetection();
+  World.add(engine.world, [mouseConstraint]);
 }
 
 function draw() {
@@ -80,7 +118,13 @@ function draw() {
   Engine.update(engine);
   snookerTable.draw();
 
-  cue.draw();
+  cueBall.draw();
 
-  drawVertices(cueBall.vertices);
+  objectBalls.draw();
+}
+
+function mousePressed() {
+  if (cueBall.isPotted) {
+    cueBall.unpot();
+  }
 }
