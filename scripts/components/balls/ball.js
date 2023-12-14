@@ -1,40 +1,48 @@
+/** Represents a ball for a Snooker game. */
 class Ball {
-    #fillColor;
-    #body;
-    #initialPosition
-    constructor(
+    #color;
+    #ball;
+    #initialPosition;
+    constructor({
         x,
         y,
         radius,
-        fillColor = color(255),
+        color = window.color(255),
         keepInitialPosition = false,
-    ) {
-        this.#fillColor = fillColor;
-        const options = { restitution: 1.2, friction: 0.001, frictionAir: 0.015 };
-        this.#body = Bodies.circle(x, y, radius, options);
-        World.add(engine.world, [this.#body]);
+        addToWorld = true,
+    }) {
+        this.#color = color;
 
+        const options = { restitution: 1.2, friction: 0.001, frictionAir: 0.015 };
+        // creates the ball
+        this.#ball = Bodies.circle(x, y, radius, options);
+
+        // add the ball to the physics world if specified
+        if (addToWorld) {
+            World.add(engine.world, this.#ball);
+        }
+
+        // store the initial position if specified
         if (keepInitialPosition) {
             this.#initialPosition = { x: x, y: y };
         }
     }
 
-    get body() { return this.#body };
+    /** The physics body of the ball. */
+    get body() { return this.#ball };
 
     get initialPosition() { return this.#initialPosition; }
 
-    isInWorld() {
-        return engine.world.bodies.includes(this.#body);
-    }
-
+    /** Remove the ball from the physics world. */
     removeFromWorld() {
-        World.remove(engine.world, this.#body);
+        World.remove(engine.world, this.#ball);
     }
 
+    /** Draw the ball on the canvas. */
     draw() {
         push();
-        fill(this.#fillColor);
-        drawVertices(this.#body.vertices);
+        fill(this.#color);
+        drawVertices(this.#ball.vertices);
         pop();
     }
 }

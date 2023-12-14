@@ -10,16 +10,17 @@
 
   <script src="scripts/main.js" type="text/javascript"></script>
   <script src="scripts/components/snooker_table/snooker_table.js" type="text/javascript"></script>
-  <script src="scripts/components/snooker_table/table_pockets.js" type="text/javascript"></script>
-  <script src="scripts/components/snooker_table/table_cushions.js" type="text/javascript"></script>
+  <script src="scripts/components/snooker_table/pockets.js" type="text/javascript"></script>
+  <script src="scripts/components/snooker_table/cushions.js" type="text/javascript"></script>
   <script src="scripts/components/cue/cue_controller.js" type="text/javascript"></script>
   <script src="scripts/components/cue/cue.js" type="text/javascript"></script>
   <script src="scripts/components/balls/ball.js" type="text/javascript"></script>
   <script src="scripts/components/balls/cue_ball.js" type="text/javascript"></script>
-  <script src="scripts/components/balls/red_balls.js" type="text/javascript"></script>
-  <script src="scripts/components/balls/coloured_balls.js" type="text/javascript"></script>
-  <script src="scripts/components/balls/object_balls.js" type="text/javascript"></script>
+  <script src="scripts/components/balls/object_balls/red_balls.js" type="text/javascript"></script>
+  <script src="scripts/components/balls/object_balls/coloured_balls.js" type="text/javascript"></script>
+  <script src="scripts/components/balls/object_balls/object_balls.js" type="text/javascript"></script>
   <script src="scripts/snooker_collision_detector.js" type="text/javascript"></script>
+  <script src="scripts/position_mode_controller.js" type="text/javascript"></script>
   <script src="scripts/helpers.js" type="text/javascript"></script>
 
   <style>
@@ -49,19 +50,18 @@
   <form id="balls_position_form">
     <label>
       <input type="radio" name="balls_position" value="starting_positions" id="starting_positions" checked> Starting
-      positions
+      positions [Z]
     </label>
 
     <label>
       <input type="radio" name="balls_position" value="random_reds_only" id="random_reds_only"> Random positions (reds
-      only)
+      only) [X]
     </label>
 
     <label>
       <input type="radio" name="balls_position" value="random_reds_and_coloured" id="random_reds_and_coloured"> Random
-      positions (reds and coloured
-      balls)
-    </label>
+      positions (reds and coloured balls) [C]
+    </label>X
   </form>
 </body>
 

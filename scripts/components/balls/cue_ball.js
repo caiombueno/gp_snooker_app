@@ -1,41 +1,56 @@
+/** Represents the cue ball in a Snooker game. */
 class CueBall extends Ball {
     #cue;
     #radius;
-    #isPotted;
-    constructor(x, y, radius) {
-        super(mouseX, mouseY, radius);
+    #isOutOfTable;
+    constructor(radius) {
+        // calls the constructor of the parent class using the current mouse position.
+        // the position doesn't matters for now since we won't add it to the world yet.
+        super({
+            x: mouseX,
+            y: mouseY,
+            radius: radius,
+            addToWorld: false,
+        });
         this.#radius = radius;
+        // sets up a new cue controller for managing cue interactions
         this.#cue = new CueController(this);
-
-        this.pot();
-
+        // a flag indicating whether the cue ball is out of the table
+        this.#isOutOfTable = true;
     }
 
+    /** Draw the cue ball on the canvas. */
     draw() {
-        if (!this.#isPotted) {
+        if (!this.#isOutOfTable) {
+            // if the cue ball is on the table, run the cue logic and draw the ball's physics body 
             this.#cue.run();
             super.draw();
         } else {
-            this.drawAtMouseLocation();
+            // if the cue ball is out of the table, draw it at the mouse location
+            this.#drawAtMouseLocation();
         }
     }
 
-    drawAtMouseLocation() {
-        ellipse(mouseX, mouseY, this.#radius * 2, this.#radius * 2);
+    /** Draw a no physics representation of the cue ball at the mouse location. */
+    #drawAtMouseLocation() {
+        const diameter = this.#radius * 2;
+        ellipse(mouseX, mouseY, diameter, diameter);
     }
 
-    pot() {
+    /** Removes the cue ball from the table and from the physical world. */
+    removeFromTable() {
         super.removeFromWorld();
-        this.drawAtMouseLocation();
-        this.#isPotted = true;
+        this.#isOutOfTable = true;
     }
 
-    unpot() {
-        this.#isPotted = false;
+    /** Add the cue ball to the physical world at the current mouse location. */
+    placeOnTable() {
+        this.#isOutOfTable = false;
         Body.setPosition(super.body, { x: mouseX, y: mouseY });
         Body.setVelocity(super.body, { x: 0, y: 0 });
         World.add(engine.world, super.body);
     }
 
-    get isPotted() { return this.#isPotted; }
+    /** A getter to check if the cue ball is currently out of the table. */
+    get isOutOfTable() { return this.#isOutOfTable; }
 }
