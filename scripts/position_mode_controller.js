@@ -25,7 +25,7 @@ class PositionModeController {
         this.#startingPositionsRadio = document.getElementById(startingPositionsRadioId);
         this.#startingPositionsRadioKey = startingPositionsRadioKey;
         this.#randomRedsOnlyRadio = document.getElementById(randomRedsOnlyRadioId);
-        console.log(randomRedsOnlyRadioId);
+
         this.#randomRedsOnlyRadioKey = randomRedsOnlyRadioKey;
         this.#randomRedsAndColouredRadio = document.getElementById(randomRedsAndColouredRadioId);
         this.#randomRedsAndColouredRadioKey = randomRedsAndColouredRadioKey;

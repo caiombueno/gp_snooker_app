@@ -48,12 +48,13 @@ function setup() {
   setupPositionModeController();
 
   // initialize a collision detector with relevant game components
-  new SnookerCollisionDetector({
+  const collisionDetector = new SnookerCollisionDetector({
     pockets: snookerTable.pockets,
     objectBalls: objectBalls,
     cueBall: cueBall,
     cushions: snookerTable.cushions,
   });
+  collisionDetector.addCollisionListener();
 
   World.add(engine.world, [mouseConstraint]);
 }
@@ -100,9 +101,9 @@ function setupBalls() {
     playFieldDimensions: snookerTable.playFieldDimensions,
     arcProperties: snookerTable.baulkArcProperties,
     ballRadius: ballRadius,
-    startingPositionsId: startingPositionsRadioId,
-    randomRedsOnlyId: randomRedsOnlyRadioId,
-    randomRedsAndColouredId: randomRedsAndColouredRadioId,
+    startingPositionsModeId: startingPositionsRadioId,
+    randomRedsOnlyModeId: randomRedsOnlyRadioId,
+    randomRedsAndColouredModeId: randomRedsAndColouredRadioId,
   });
 }
 

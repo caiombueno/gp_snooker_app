@@ -7,8 +7,7 @@ class SnookerCollisionDetector {
   #objectBalls;
   #cueBall;
   #cushions;
-
-  #previousPottedBallKey;
+  #pocketCollisionHandler;
 
   constructor({
     pockets,
@@ -16,119 +15,104 @@ class SnookerCollisionDetector {
     cueBall,
     cushions,
   }) {
-    // initialize private fields
     this.#pockets = pockets;
     this.#objectBalls = objectBalls;
     this.#cueBall = cueBall;
     this.#cushions = cushions;
-    this.#addCollisionListener();
-  }
 
-  static get #cueBallKey() { return 'cueBall'; }
-  static get #redBallKey() { return 'redBall'; }
-  static get #colouredBallKey() { return 'colouredBall'; }
+    // instantiate a [PocketCollisionHandler] to manage when a ball is potted
+    this.#pocketCollisionHandler = new PocketCollisionHandler({
+      objectBalls: objectBalls,
+      cueBall: cueBall,
+      onDisplayMessage: this.#displayMessage,
+    });
+  }
 
   /**
    * Adds a collision event listener to the physics engine.
    * Handles various types of collisions and triggers appropriate actions.
    */
-  #addCollisionListener() {
+  addCollisionListener() {
     Events.on(engine, 'collisionEnd', (event) => {
       event.pairs.forEach((collision) => {
         const bodyA = collision.bodyA;
         const bodyB = collision.bodyB;
+
         const isPocketCollision = this.#pockets.isBodyAPocket(bodyA) || this.#pockets.isBodyAPocket(bodyB);
+        const isCueBallCollision = bodyA == this.#cueBall.body || bodyB == this.#cueBall;
 
-        const cueBallIsBodyA = bodyA == this.#cueBall.body;
-        const cueBallIsBodyB = bodyB == this.#cueBall.body;
-        const isCueBallCollision = cueBallIsBodyA || cueBallIsBodyB;
+        const isCushionColision = this.#isCushionCollision(bodyA, bodyB);
+        const redBallInCollision = this.#redBallInCollision(bodyA, bodyB);
+        const colouredBallInCollision = this.#colouredBallInCollision(bodyA, bodyB);
 
+
+        // notifies the user when the collision involves the cue ball
         if (isCueBallCollision) {
-          this.#onCueBallCollision({
-            bodyA: bodyA,
-            bodyB: bodyB,
-            isPocketCollision: isPocketCollision,
-          });
+          if (isCushionColision) {
+            this.#displayMessage('cue-cushion collision!');
+          } else if (redBallInCollision) {
+            this.#displayMessage('cue-red collision!');
+          } else if (colouredBallInCollision) {
+            this.#displayMessage('cue-colour collision!');
+          } else if (isPocketCollision) {
+            this.#displayMessage('cue-pocket collision!');
+          }
         }
 
-
-        this.#checkRedBallCollision({
-          bodyA: bodyA,
-          bodyB: bodyB,
-          isPocketCollision: isPocketCollision,
-          isCueBallCollision: isCueBallCollision,
-        });
-
-        this.#checkColouredBallCollision({
-          bodyA: bodyA,
-          bodyB: bodyB,
-          isPocketCollision: isPocketCollision,
-          isCueBallCollision: isCueBallCollision,
-        });
+        // handles events when a ball is potted
+        if (isPocketCollision) {
+          if (isCueBallCollision) {
+            this.#pocketCollisionHandler.onCueBallPotted();
+          } else if (redBallInCollision) {
+            this.#pocketCollisionHandler.onRedBallPotted(redBallInCollision);
+          } else if (colouredBallInCollision) {
+            this.#pocketCollisionHandler.onColouredBallPotted(colouredBallInCollision);
+          }
+        }
       });
     });
   }
 
-  /** Handle collisions involving the cue ball and a pocket or a cushion.*/
-  #onCueBallCollision({ bodyA, bodyB, isPocketCollision }) {
-    if (isPocketCollision) {
-      this.#previousPottedBallKey = SnookerCollisionDetector.#cueBallKey;
-      this.#displayMessage('cue-pocket collision!');
-      this.#cueBall.removeFromTable();
-    } else {
-      const isCushionColision = this.#cushions.isBodyACushion(bodyA) || this.#cushions.isBodyACushion(bodyB);
-      if (isCushionColision) {
-        this.#displayMessage('cue-cushion collision!');
-      }
+  /** Checks if the collision involves a cushion.*/
+  #isCushionCollision(bodyA, bodyB) {
+    const isCushionColision = this.#cushions.isBodyACushion(bodyA) || this.#cushions.isBodyACushion(bodyB);
+    if (isCushionColision) {
+      return true;
     }
   }
 
-  /**
-   * Checks collisions involving red balls.
-   * Triggers actions based on pocket or cue ball collisions.
+  /** 
+   * If a red ball was involved in the collision, return the red ball's body.
+   * Else, return null.
    */
-  #checkRedBallCollision({ bodyA, bodyB, isPocketCollision, isCueBallCollision }) {
+  #redBallInCollision(bodyA, bodyB) {
     const bodyAIsARedBall = this.#objectBalls.isBodyARedBall(bodyA);
-    const bodyBIsARedBall = this.#objectBalls.isBodyARedBall(bodyB);
-    const isRedBallCollision = bodyAIsARedBall || bodyBIsARedBall;
-    if (isRedBallCollision) {
-      if (isPocketCollision) {
-        this.#previousPottedBallKey = SnookerCollisionDetector.#redBallKey;
-        if (bodyAIsARedBall) {
-          this.#objectBalls.onRedBallPotted(bodyA);
-        } else if (bodyBIsARedBall) {
-          this.#objectBalls.onRedBallPotted(bodyB);
-        }
-      } else if (isCueBallCollision) {
-        this.#displayMessage('cue-red collision!');
-      }
+    if (bodyAIsARedBall) {
+      return bodyA;
     }
+    const bodyBIsARedBall = this.#objectBalls.isBodyARedBall(bodyB);
+    if (bodyBIsARedBall) {
+      return bodyB;
+    }
+
+    return null;
   }
 
-  /**
-   * Checks collisions involving coloured balls.
-   * Triggers actions based on pocket, cue ball, or consecutive coloured ball collisions.
+  /** 
+   * If a coloured ball was involved in the collision, return the red ball's body.
+   * Else, return null.
    */
-  #checkColouredBallCollision({ bodyA, bodyB, isPocketCollision, isCueBallCollision }) {
+  #colouredBallInCollision(bodyA, bodyB) {
     const bodyAIsAColouredBall = this.#objectBalls.isBodyAColouredBall(bodyA);
-    const bodyBIsAColouredBall = this.#objectBalls.isBodyAColouredBall(bodyB);
-    const isColouredBallCollision = bodyAIsAColouredBall || bodyBIsAColouredBall;
-
-    if (isColouredBallCollision) {
-      if (isPocketCollision) {
-        if (this.#previousPottedBallKey == SnookerCollisionDetector.#colouredBallKey) {
-          this.#displayMessage('You can\'t pot two consecutives coloured balls!');
-        }
-        this.#previousPottedBallKey = SnookerCollisionDetector.#colouredBallKey;
-        if (bodyAIsAColouredBall) {
-          this.#objectBalls.onColouredBallPotted(bodyA);
-        } else if (bodyBIsAColouredBall) {
-          this.#objectBalls.onColouredBallPotted(bodyB);
-        }
-      } else if (isCueBallCollision) {
-        this.#displayMessage('cue-colour collision!');
-      }
+    if (bodyAIsAColouredBall) {
+      return bodyA;
     }
+    const bodyBIsAColouredBall = this.#objectBalls.isBodyAColouredBall(bodyB);
+    if (bodyBIsAColouredBall) {
+      return bodyB;
+    }
+
+    return null;
   }
 
   /** Displays a message in the console and creates a temporary HTML element for visual feedback. */
@@ -140,5 +124,58 @@ class SnookerCollisionDetector {
     setTimeout(() => {
       htmlElement.remove();
     }, 3000);
+  }
+}
+
+/** 
+ * Manages actions related to ball potting 
+ * and keeps track of the latest potted ball.
+ */
+class PocketCollisionHandler {
+  #objectBalls;
+  #cueBall;
+  #latestPottedBallKey;
+  #displayMessage;
+  constructor({
+    objectBalls,
+    cueBall,
+    onDisplayMessage,
+  }) {
+    this.#objectBalls = objectBalls;
+    this.#cueBall = cueBall;
+    this.#displayMessage = onDisplayMessage;
+  }
+
+  /**
+   * Those keys will be assigned to [#latestPottedBallKey] everytime a ball is potted
+   * in order to keep track of the of the type of the latest potted ball.
+   */
+  static get #cueBallKey() { return 'cueBall'; }
+  static get #redBallKey() { return 'redBall'; }
+  static get #colouredBallKey() { return 'colouredBall'; }
+
+  /** Handles actions when the cue ball is potted.*/
+  onCueBallPotted() {
+    // register latest potted ball
+    this.#latestPottedBallKey = PocketCollisionHandler.#cueBallKey;
+    this.#cueBall.removeFromTable();
+  }
+
+  /** Handles actions when a red ball is potted.*/
+  onRedBallPotted(body) {
+    // register latest potted ball
+    this.#latestPottedBallKey = PocketCollisionHandler.#redBallKey;
+    this.#objectBalls.onRedBallPotted(body);
+  }
+
+  /** Handles actions when a coloured ball is potted.*/
+  onColouredBallPotted(body) {
+    if (this.#latestPottedBallKey == PocketCollisionHandler.#colouredBallKey) {
+      // warn the user if two colored balls were consecutively potted
+      this.#displayMessage('You can\'t pot two consecutives coloured balls!');
+    }
+    // register latest potted ball
+    this.#latestPottedBallKey = PocketCollisionHandler.#colouredBallKey;
+    this.#objectBalls.onColouredBallPotted(body);
   }
 }
