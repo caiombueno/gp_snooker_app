@@ -11,6 +11,16 @@ function drawVertices(vertices) {
 function getRandomInt({ min, max }) {
     min = Math.ceil(min);
     max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(random(min, max));
 }
 
+/** Displays a message in the console and creates a temporary HTML element for visual feedback. */
+function displayMessage(message) {
+    console.log(message);
+    const htmlElement = createP(message);
+    htmlElement.class('red-text');
+
+    setTimeout(() => {
+        htmlElement.remove();
+    }, 3000);
+}

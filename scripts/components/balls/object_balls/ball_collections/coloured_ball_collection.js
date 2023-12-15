@@ -2,11 +2,14 @@
  * Represents the collection of coloured balls in a Snooker game. 
  * This class provides methods for creating standard or randomly positioned coloured balls.
 */
-class ColouredBalls {
+class ColouredBallCollection extends SnookerBallsCollection {
+    constructor() {
+        super();
+    }
 
     /** Creates the coloured balls arranged as in a usual Snooker game. */
     static standard({ ballRadius, arcMiddlePositionXPos, arcRadius, tableMiddlePosition, tableWidth }) {
-        return new StandardPositionedColouredBalls({
+        return new StandardPositionedColouredBallCollection({
             ballRadius: ballRadius,
             arcMiddlePositionXPos: arcMiddlePositionXPos,
             arcRadius: arcRadius,
@@ -17,15 +20,10 @@ class ColouredBalls {
 
     /** Creates the coloured balls arranged randomly within the playfield area. */
     static random({ playFieldDimensions, ballRadius }) {
-        return new RandomlyPositionedColouredBalls({
+        return new RandomlyPositionedColouredBallCollection({
             playFieldDimensions: playFieldDimensions,
             ballRadius: ballRadius,
         });
-    }
-
-    /** Check if a given body is one of the coloured balls. */
-    isBodyAColouredBall(body) {
-        return this._balls.some(ball => ball.body === body);
     }
 
     /** Handles the event when a coloured ball is potted. */
@@ -42,29 +40,10 @@ class ColouredBalls {
             Body.setPosition(body, ball.initialPosition);
         }
     }
-
-    /** Removes all coloured balls from the physical world. */
-    removeFromWorld() {
-        let bodies = [];
-
-        for (let i = 0; i < this._balls.length; i++) {
-            const body = this._balls[i].body;
-            bodies.push(body);
-        }
-
-        World.remove(engine.world, bodies);
-    }
-
-    /** Draw all coloured balls on the canvas. */
-    draw() {
-        for (let i = 0; i < this._balls.length; i++) {
-            this._balls[i].draw();
-        }
-    }
 }
 
 /** Represents a collection of coloured balls arranged as in a usual Snooker game. */
-class StandardPositionedColouredBalls extends ColouredBalls {
+class StandardPositionedColouredBallCollection extends ColouredBallCollection {
     #ballRadius;
     constructor({ ballRadius, arcMiddlePositionXPos, arcRadius, tableMiddlePosition, tableWidth }) {
         super();
@@ -113,54 +92,54 @@ class StandardPositionedColouredBalls extends ColouredBalls {
 
     /** Creates a coloured ball given a position and color.  */
     #newStandardPositionedBall({ x, y, color }) {
-        return new Ball({
+        return new ColouredBall({
             x: x,
             y: y,
             color: color,
             // all the coloured balls should have the same radius and keep their initiial position
             radius: this.#ballRadius,
-            keepInitialPosition: true,
         });
     }
 }
 
 /** Represents a collection of coloured balls arranged randomly within the playfield area. */
-class RandomlyPositionedColouredBalls extends ColouredBalls {
+class RandomlyPositionedColouredBallCollection extends ColouredBallCollection {
     #ballRadius;
-    #randomXRange;
-    #randomYRange;
+    #playFieldDimensions;
     constructor({ playFieldDimensions, ballRadius }) {
         super();
-        this.#randomXRange = { min: playFieldDimensions.initialX, max: playFieldDimensions.endX };
-        this.#randomYRange = { min: playFieldDimensions.initialY, max: playFieldDimensions.endY };
+        this.#playFieldDimensions = playFieldDimensions;
         this.#ballRadius = ballRadius;
 
+        const randomPositions = RandomlyPositionedBallCollectionHelper.getRandomPositionsWithinPlayfield(6, this.#playFieldDimensions);
+
         // creates each coloured ball in a random position
-        const greenBall = this.#newRandomlyPositionedBall(color(0, 255, 0));
+        const greenBall = this.#newRandomlyPositionedBall(color(0, 255, 0), randomPositions[0]);
 
-        const yellowBall = this.#newRandomlyPositionedBall(color(255, 255, 0));
+        const yellowBall = this.#newRandomlyPositionedBall(color(255, 255, 0), randomPositions[1]);
 
-        const orangeBall = this.#newRandomlyPositionedBall(color(255, 165, 0));
+        const orangeBall = this.#newRandomlyPositionedBall(color(255, 165, 0), randomPositions[2]);
 
-        const blueBall = this.#newRandomlyPositionedBall(color(0, 0, 255));
+        const blueBall = this.#newRandomlyPositionedBall(color(0, 0, 255), randomPositions[3]);
 
-        const pinkBall = this.#newRandomlyPositionedBall(color(255, 192, 203));
+        const pinkBall = this.#newRandomlyPositionedBall(color(255, 192, 203), randomPositions[4]);
 
-        const blackBall = this.#newRandomlyPositionedBall(color(0));
+        const blackBall = this.#newRandomlyPositionedBall(color(0), randomPositions[5]);
 
         this._balls = [greenBall, yellowBall, orangeBall, blueBall, pinkBall, blackBall];
     }
 
     /** Creates a random ball given a color.  */
-    #newRandomlyPositionedBall(color) {
-        return new Ball({
+    #newRandomlyPositionedBall(color, randomPosition) {
+
+        return new ColouredBall({
             // generates a random position within the playfield range
-            x: getRandomInt(this.#randomXRange),
-            y: getRandomInt(this.#randomYRange),
+            x: randomPosition.x,
+            y: randomPosition.y,
             color: color,
             // all the coloured balls should have the same radius and keep their initiial position
             radius: this.#ballRadius,
-            keepInitialPosition: true,
         });
     }
 }
+

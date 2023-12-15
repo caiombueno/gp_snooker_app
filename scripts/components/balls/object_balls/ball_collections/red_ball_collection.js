@@ -2,14 +2,14 @@
  * Represents the collection of red balls in a Snooker game. 
  * This class provides methods for creating standard or randomly positioned red balls.
 */
-class RedBalls {
+class RedBallCollection extends SnookerBallsCollection {
     constructor() {
-        this._balls = [];
+        super();
     }
 
     /** Creates the red balls arranged as in a usual Snooker game. */
     static standard({ xPos, yPos, ballRadius }) {
-        return new StandardPositionedRedBalls({
+        return new StandardPositionedRedBallCollection({
             xPos: xPos,
             yPos: yPos,
             ballRadius: ballRadius
@@ -18,15 +18,10 @@ class RedBalls {
 
     /** Creates the red balls arranged randomly within the playfield area. */
     static random({ playFieldDimensions, ballRadius }) {
-        return new RandomlyPositionedRedBalls({
+        return new RandomlyPositionedRedBallCollection({
             playFieldDimensions: playFieldDimensions,
             ballRadius: ballRadius,
         });
-    }
-
-    /** Check if a given body is one of the red balls. */
-    isBodyARedBall(body) {
-        return this._balls.some(ball => ball.body === body);
     }
 
     /** Handles the event when a red ball is potted. */
@@ -41,30 +36,10 @@ class RedBalls {
             World.remove(engine.world, ball.body);
         }
     }
-
-
-    /** Removes all red balls from the physical world. */
-    removeFromWorld() {
-        let bodies = [];
-
-        for (let i = 0; i < this._balls.length; i++) {
-            const body = this._balls[i].body;
-            bodies.push(body);
-        }
-
-        World.remove(engine.world, bodies);
-    }
-
-    /** Draw all red balls on the canvas. */
-    draw() {
-        for (let i = 0; i < this._balls.length; i++) {
-            this._balls[i].draw();
-        }
-    }
 }
 
 /** Represents a collection of red balls arranged as in a usual Snooker game. */
-class StandardPositionedRedBalls extends RedBalls {
+class StandardPositionedRedBallCollection extends RedBallCollection {
     constructor({ xPos, yPos, ballRadius }) {
         super();
         const numRows = 5;
@@ -91,16 +66,16 @@ class StandardPositionedRedBalls extends RedBalls {
 }
 
 /** Represents a collection of red balls arranged randomly within the playfield area. */
-class RandomlyPositionedRedBalls extends RedBalls {
+class RandomlyPositionedRedBallCollection extends RedBallCollection {
     constructor({ playFieldDimensions, ballRadius }) {
         super();
-        const randomXRange = { min: playFieldDimensions.initialX, max: playFieldDimensions.endX };
-        const randomYRange = { min: playFieldDimensions.initialY, max: playFieldDimensions.endY };
+        const numberOfBalls = 15;
+        const randomPositions = RandomlyPositionedBallCollectionHelper.getRandomPositionsWithinPlayfield(numberOfBalls, playFieldDimensions);
 
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < numberOfBalls; i++) {
             const redBall = new Ball({
-                x: getRandomInt(randomXRange),
-                y: getRandomInt(randomYRange),
+                x: randomPositions[i].x,
+                y: randomPositions[i].y,
                 radius: ballRadius,
                 color: color(255, 0, 0),
             });

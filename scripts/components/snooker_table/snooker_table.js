@@ -7,13 +7,9 @@ class SnookerTable {
     #railThickness;
     #pockets;
     #tableCushions;
-    #lineXPos;
-    #lineStartYPos;
-    #lineEndYPos;
-    #centerYPos;
-    #whiteArcDiameter;
-    #arcStartAngle;
-    #arcEndAngle;
+
+    #baulk;
+
 
     constructor(xPos, yPos, width, height) {
         // initialize private fields
@@ -26,7 +22,11 @@ class SnookerTable {
         const pocketDiameter = (this.#height / 36) * 1.5;
         this.#pockets = new Pockets(xPos, yPos, width, height, pocketDiameter);
 
-        this.#initializeBaulkArcProperties();
+        this.#baulk = new Baulk({
+            tablePosition: { x: xPos, y: yPos },
+            tableDimensions: { width: width, height: height },
+            railThickness: this.#railThickness,
+        });
 
         this.#tableCushions = new Cushions(xPos, yPos, width, height, this.#railThickness, pocketDiameter);
     }
@@ -35,40 +35,28 @@ class SnookerTable {
     get cushions() { return this.#tableCushions; }
 
     /** The pockets for this table. */
-    get pockets() { return this.#pockets };
+    get pockets() { return this.#pockets; }
 
     /** The width of this table. */
-    get width() { return this.#width };
+    get width() { return this.#width; }
+
+    get baulk() { return this.#baulk; }
 
     /** The play field dimensions of this table. */
     get playFieldDimensions() {
         const tableAndCushionThickness = this.#railThickness + this.#tableCushions.thickness;
+        const initialX = this.#xPos + tableAndCushionThickness;
+        const endX = this.#xPos + this.#width - tableAndCushionThickness;
+        const initialY = this.#yPos + tableAndCushionThickness;
+        const endY = this.#yPos + this.#height - tableAndCushionThickness;
         return {
-            initialX: this.#xPos + tableAndCushionThickness,
-            endX: this.#xPos + this.#width - tableAndCushionThickness,
-            initialY: this.#yPos + tableAndCushionThickness,
-            endY: this.#yPos + this.#height - tableAndCushionThickness,
+            initialX: initialX,
+            endX: endX,
+            initialY: initialY,
+            endY: endY,
+            width: endX - initialX,
+            height: endY - initialY,
         };
-    }
-
-    /** The arc's x, y and radius for this table. */
-    get baulkArcProperties() {
-        return {
-            x: this.#lineXPos,
-            y: this.#centerYPos,
-            radius: this.#whiteArcDiameter / 2,
-        };
-    }
-
-    /** Calculates and initializes the propreties of the baulk arc. */
-    #initializeBaulkArcProperties() {
-        this.#lineXPos = this.#xPos + this.#width * 0.25;
-        this.#lineStartYPos = this.#yPos + this.#railThickness;
-        this.#lineEndYPos = this.#yPos + this.#height - this.#railThickness;
-        this.#centerYPos = this.#yPos + this.#height * 0.5
-        this.#whiteArcDiameter = this.#height * 0.3;
-        this.#arcStartAngle = 0.5 * PI;
-        this.#arcEndAngle = 1.5 * PI;
     }
 
     /** Draw the snooker table on the canvas. */
@@ -81,13 +69,69 @@ class SnookerTable {
         rect(this.#xPos, this.#yPos, this.#width, this.#height, 5);
         pop();
 
-        this.#drawBaulkLines();
+        this.#baulk.draw();
 
         this.#tableCushions.draw();
         this.#pockets.draw();
     }
+}
 
-    #drawBaulkLines() {
+class Baulk {
+    #lineXPos;
+    #lineStartYPos;
+    #lineEndYPos;
+    #centerYPos;
+    #whiteArcDiameter;
+    #arcStartAngle;
+    #arcEndAngle;
+    constructor({ tablePosition, tableDimensions, railThickness }) {
+        // Calculates and initializes the propreties of the baulk arc.
+        this.#lineXPos = tablePosition.x + tableDimensions.width * 0.25;
+        this.#lineStartYPos = tablePosition.y + railThickness;
+        this.#lineEndYPos = tablePosition.y + tableDimensions.height - railThickness;
+        this.#centerYPos = tablePosition.y + tableDimensions.height * 0.5
+        this.#whiteArcDiameter = tableDimensions.height * 0.3;
+        this.#arcStartAngle = 0.5 * PI;
+        this.#arcEndAngle = 1.5 * PI;
+    }
+
+    /** The arc's x, y and radius. */
+    get arcProperties() {
+        return {
+            centerX: this.#lineXPos,
+            centerY: this.#centerYPos,
+            radius: this.#whiteArcDiameter / 2,
+        };
+    }
+
+    // Check if an object is within the semicircular arc
+    isObjectWithinArc(objectPosition) {
+        const arcProperties = snookerTable.baulk.arcProperties;
+        // Calculate the distance between the object and the center of the arc
+        const distance = dist(objectPosition.x, objectPosition.y, arcProperties.centerX, arcProperties.centerY);
+
+        // Check if the distance is within the radius of the arc
+        if (distance <= arcProperties.radius) {
+            // Calculate the angle of the object in relation to the center of the arc
+            const angle = atan2(objectPosition.y - arcProperties.centerY, objectPosition.x - arcProperties.centerX);
+
+            // Adjust angles to be positive and within the range of the arc
+            const normalizedAngle = (angle + TWO_PI) % TWO_PI;
+            const normalizedStartAngle = (PI * 0.5 + TWO_PI) % TWO_PI;
+            const normalizedEndAngle = (PI * 1.5 + TWO_PI) % TWO_PI;
+
+            // Check if the normalized angle is within the range of the arc
+            if (normalizedStartAngle < normalizedEndAngle) {
+                return normalizedAngle >= normalizedStartAngle && normalizedAngle <= normalizedEndAngle;
+            } else {
+                return normalizedAngle >= normalizedStartAngle || normalizedAngle <= normalizedEndAngle;
+            }
+        }
+
+        return false;
+    }
+
+    draw() {
         // draw the vertical line
         push();
         stroke(255);
@@ -99,4 +143,3 @@ class SnookerTable {
         pop();
     }
 }
-

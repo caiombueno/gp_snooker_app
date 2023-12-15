@@ -99,7 +99,7 @@ function setupBalls() {
   // create new object balls with the specified parameters
   objectBalls = new ObjectBalls({
     playFieldDimensions: snookerTable.playFieldDimensions,
-    arcProperties: snookerTable.baulkArcProperties,
+    arcProperties: snookerTable.baulk.arcProperties,
     ballRadius: ballRadius,
     startingPositionsModeId: startingPositionsRadioId,
     randomRedsOnlyModeId: randomRedsOnlyRadioId,
@@ -134,18 +134,11 @@ function setupPositionModeController() {
 function mousePressed() {
   // check if the cue ball is out of the table
   if (cueBall.isOutOfTable) {
-    const playFieldDimensions = snookerTable.playFieldDimensions;
-
-    // check if the mouse is within the X and Y play field range
-    const mouseIsWithinXPlayFieldRange = (mouseX >= playFieldDimensions.initialX && mouseX <= playFieldDimensions.endX);
-    const mouseIsWithinYPlayFieldRange = (mouseY >= playFieldDimensions.initialY && mouseY <= playFieldDimensions.endY);
-
-    // check if the mouse is within the overall play field dimensions
-    const mouseIsWithinPlayFieldDimensions = mouseIsWithinXPlayFieldRange && mouseIsWithinYPlayFieldRange;
-
     // if the mouse is within the play field dimensions, place the cue ball on the table
-    if (mouseIsWithinPlayFieldDimensions) {
+    if (snookerTable.baulk.isObjectWithinArc({ x: mouseX, y: mouseY })) {
       cueBall.placeOnTable();
+    } else {
+      displayMessage('The cue ball can only be placed within the baulk arc!');
     }
   }
 }

@@ -2,13 +2,11 @@
 class Ball {
     #color;
     #ball;
-    #initialPosition;
     constructor({
         x,
         y,
         radius,
         color = window.color(255),
-        keepInitialPosition = false,
         addToWorld = true,
     }) {
         this.#color = color;
@@ -21,17 +19,19 @@ class Ball {
         if (addToWorld) {
             World.add(engine.world, this.#ball);
         }
-
-        // store the initial position if specified
-        if (keepInitialPosition) {
-            this.#initialPosition = { x: x, y: y };
-        }
     }
 
     /** The physics body of the ball. */
     get body() { return this.#ball };
 
-    get initialPosition() { return this.#initialPosition; }
+    get position() {
+        return { x: this.#ball.position.x, y: this.#ball.position.y };
+    }
+
+    moveTo(x, y) {
+        Body.setPosition(this.body, { x: x, y: y });
+        Body.setVelocity(this.body, { x: 0, y: 0 });
+    }
 
     /** Remove the ball from the physics world. */
     removeFromWorld() {
@@ -46,4 +46,3 @@ class Ball {
         pop();
     }
 }
-

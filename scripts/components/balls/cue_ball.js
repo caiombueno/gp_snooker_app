@@ -46,8 +46,7 @@ class CueBall extends Ball {
     /** Add the cue ball to the physical world at the current mouse location. */
     placeOnTable() {
         this.#isOutOfTable = false;
-        Body.setPosition(super.body, { x: mouseX, y: mouseY });
-        Body.setVelocity(super.body, { x: 0, y: 0 });
+        super.moveTo(mouseX, mouseY);
         World.add(engine.world, super.body);
     }
 

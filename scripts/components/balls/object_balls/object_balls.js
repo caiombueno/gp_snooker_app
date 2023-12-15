@@ -70,12 +70,12 @@ class ObjectBalls {
 
     /** Check if a given body is one of the red balls. */
     isBodyARedBall(body) {
-        return this.#redBalls.isBodyARedBall(body);
+        return this.#redBalls.isBodyPartFromABallFromCollection(body);
     }
 
     /** Check if a given body is one of the coloured balls. */
     isBodyAColouredBall(body) {
-        return this.#colouredBalls.isBodyAColouredBall(body);
+        return this.#colouredBalls.isBodyPartFromABallFromCollection(body);
     }
 
     /**
@@ -84,6 +84,7 @@ class ObjectBalls {
      * If [positionMode] is not specified. Use the standard start positions of a Snooker game.
      */
     #setupBalls(positionMode = this.#startingPositionsModeId) {
+
         if (positionMode === this.#startingPositionsModeId || positionMode === this.#randomRedsOnlyModeId) {
             // calculate the x and y positions of the middle of the table
             const tableMiddlePosition = {
@@ -92,9 +93,9 @@ class ObjectBalls {
             };
 
             // coloured balls are set up on standard position either on starting positions and random reds only position modes
-            this.#colouredBalls = ColouredBalls.standard({
+            this.#colouredBalls = ColouredBallCollection.standard({
                 ballRadius: this.#ballRadius,
-                arcMiddlePositionXPos: this.#arcProperties.x,
+                arcMiddlePositionXPos: this.#arcProperties.centerX,
                 arcRadius: this.#arcProperties.radius,
                 tableMiddlePosition: tableMiddlePosition,
                 tableWidth: this.#tableMeasures.width,
@@ -102,7 +103,7 @@ class ObjectBalls {
 
             if (positionMode === this.#startingPositionsModeId) {
                 // set up red balls as standard position as well
-                this.#redBalls = RedBalls.standard({
+                this.#redBalls = RedBallCollection.standard({
                     xPos: this.#playFieldDimensions.initialX + this.#tableMeasures.width * 0.75,
                     yPos: tableMiddlePosition.y,
                     ballRadius: this.#ballRadius
@@ -111,19 +112,28 @@ class ObjectBalls {
             } else if (positionMode === this.#randomRedsOnlyModeId) {
                 // if position mode is random reds only, set up red balls on random positions
                 this.#setupRandomlyPositionedRedBalls();
+                this.#ensureUniqueBallPositions();
             }
 
         } else if (positionMode === this.#randomRedsAndColouredModeId) {
             // if position mode is random reds and coloured, set up both on random positions
             this.#setupRandomlyPositionedRedBalls();
-            this.#colouredBalls = ColouredBalls.random({ playFieldDimensions: this.#playFieldDimensions, ballRadius: this.#ballRadius });
-
+            this.#colouredBalls = ColouredBallCollection.random({ playFieldDimensions: this.#playFieldDimensions, ballRadius: this.#ballRadius });
+            this.#ensureUniqueBallPositions();
         }
+    }
+
+    #ensureUniqueBallPositions() {
+        RandomlyPositionedBallCollectionHelper.ensureUniqueBallPositions({
+            firstBallCollection: this.#redBalls,
+            secondBallCollection: this.#colouredBalls,
+            playFieldDimensions: this.#playFieldDimensions,
+        });
     }
 
     /** Set up red balls on random positions within the playfield. */
     #setupRandomlyPositionedRedBalls() {
-        this.#redBalls = RedBalls.random({ playFieldDimensions: this.#playFieldDimensions, ballRadius: this.#ballRadius });
+        this.#redBalls = RedBallCollection.random({ playFieldDimensions: this.#playFieldDimensions, ballRadius: this.#ballRadius });
     }
 
     /** Remove all object balls from the physical world. */

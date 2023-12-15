@@ -24,7 +24,6 @@ class SnookerCollisionDetector {
     this.#pocketCollisionHandler = new PocketCollisionHandler({
       objectBalls: objectBalls,
       cueBall: cueBall,
-      onDisplayMessage: this.#displayMessage,
     });
   }
 
@@ -49,13 +48,13 @@ class SnookerCollisionDetector {
         // notifies the user when the collision involves the cue ball
         if (isCueBallCollision) {
           if (isCushionColision) {
-            this.#displayMessage('cue-cushion collision!');
+            displayMessage('cue-cushion collision!');
           } else if (redBallInCollision) {
-            this.#displayMessage('cue-red collision!');
+            displayMessage('cue-red collision!');
           } else if (colouredBallInCollision) {
-            this.#displayMessage('cue-colour collision!');
+            displayMessage('cue-colour collision!');
           } else if (isPocketCollision) {
-            this.#displayMessage('cue-pocket collision!');
+            displayMessage('cue-pocket collision!');
           }
         }
 
@@ -114,17 +113,6 @@ class SnookerCollisionDetector {
 
     return null;
   }
-
-  /** Displays a message in the console and creates a temporary HTML element for visual feedback. */
-  #displayMessage(message) {
-    console.log(message);
-    const htmlElement = createP(message);
-    htmlElement.class('red-text');
-
-    setTimeout(() => {
-      htmlElement.remove();
-    }, 3000);
-  }
 }
 
 /** 
@@ -135,7 +123,7 @@ class PocketCollisionHandler {
   #objectBalls;
   #cueBall;
   #latestPottedBallKey;
-  #displayMessage;
+
   constructor({
     objectBalls,
     cueBall,
@@ -143,7 +131,6 @@ class PocketCollisionHandler {
   }) {
     this.#objectBalls = objectBalls;
     this.#cueBall = cueBall;
-    this.#displayMessage = onDisplayMessage;
   }
 
   /**
@@ -172,7 +159,7 @@ class PocketCollisionHandler {
   onColouredBallPotted(body) {
     if (this.#latestPottedBallKey == PocketCollisionHandler.#colouredBallKey) {
       // warn the user if two colored balls were consecutively potted
-      this.#displayMessage('You can\'t pot two consecutives coloured balls!');
+      displayMessage('You can\'t pot two consecutives coloured balls!');
     }
     // register latest potted ball
     this.#latestPottedBallKey = PocketCollisionHandler.#colouredBallKey;
