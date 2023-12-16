@@ -82,7 +82,7 @@ class StandardPositionedColouredBallCollection extends ColouredBallCollection {
         });
 
         const blackBall = this.#newStandardPositionedBall({
-            x: tableMiddlePosition.x + tableWidth * 0.4,
+            x: tableMiddlePosition.x + tableWidth * 0.45,
             y: tableMiddlePosition.y,
             color: color(0),
         });

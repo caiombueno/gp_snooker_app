@@ -13,6 +13,8 @@ class CueBall extends Ball {
             addToWorld: false,
         });
         this.#radius = radius;
+        console.log(radius);
+        Body.setMass(super.body, radius * 8);
         // sets up a new cue controller for managing cue interactions
         this.#cue = new CueController(this);
         // a flag indicating whether the cue ball is out of the table

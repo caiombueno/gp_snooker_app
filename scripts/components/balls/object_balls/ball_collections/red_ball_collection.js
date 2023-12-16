@@ -43,16 +43,20 @@ class StandardPositionedRedBallCollection extends RedBallCollection {
     constructor({ xPos, yPos, ballRadius }) {
         super();
         const numRows = 5;
-        const spacing = 15;
+        // Adjust the initial spacing based on the ballRadius
+        const initialSpacing = ballRadius * 2.5;
+        const spacingFactor = 1; // You can adjust this factor based on your preferences
 
         // creates the red balls
         // the position of each ball is calculated so that they form a triangle shape
         for (let i = 1; i <= numRows; i++) {
-            const yOffset = (yPos - i * spacing / 2) + ballRadius;
+            // Adjust the yOffset calculation based on the ballRadius
+            const yOffset = (yPos - i * initialSpacing / 2) + ballRadius;
 
             for (let j = 0; j < i; j++) {
-                const x = xPos + i * spacing;
-                const y = yOffset + j * spacing;
+                // Adjust the x calculation based on the ballRadius
+                const x = xPos + i * initialSpacing * spacingFactor;
+                const y = yOffset + j * initialSpacing;
                 const redBall = new Ball({
                     x: x,
                     y: y,
@@ -62,6 +66,7 @@ class StandardPositionedRedBallCollection extends RedBallCollection {
                 this._balls.push(redBall);
             }
         }
+
     }
 }
 

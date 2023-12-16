@@ -18,7 +18,7 @@ class SnookerTable {
         this.#width = width;
         this.#height = height;
 
-        this.#railThickness = 10;
+        this.#railThickness = width / 100;
         const pocketDiameter = (this.#height / 36) * 1.5;
         this.#pockets = new Pockets(xPos, yPos, width, height, pocketDiameter);
 

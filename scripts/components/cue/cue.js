@@ -14,7 +14,7 @@ class Cue {
         this.#cueBallRadiusWithDistance = cueBallRadius + cueDistance;
         this.#cueStickWidth = width - this.#cueBallRadiusWithDistance;
         this.#cueTipWidth = 5;
-        this.#cueHeight = 5;
+        this.#cueHeight = this.#cueStickWidth * 0.025;
         this.#cueXPos = 0;
         this.#cueYPos = - this.#cueHeight * 0.5;
     }
@@ -33,8 +33,10 @@ class Cue {
         translate(cueXPos, cueYPos);
         rotate(angle);
 
-        // draw the main part of the cue stick
-        fill(139, 69, 19);
+        stroke(this.#cueHeight) /
+
+            // draw the main part of the cue stick
+            fill(139, 69, 19);
         rect(this.#cueXPos, this.#cueYPos, this.#cueStickWidth, this.#cueHeight);
 
         // draw the cue tip

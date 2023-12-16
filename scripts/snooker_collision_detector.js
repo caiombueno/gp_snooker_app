@@ -38,7 +38,7 @@ class SnookerCollisionDetector {
         const bodyB = collision.bodyB;
 
         const isPocketCollision = this.#pockets.isBodyAPocket(bodyA) || this.#pockets.isBodyAPocket(bodyB);
-        const isCueBallCollision = bodyA == this.#cueBall.body || bodyB == this.#cueBall;
+        const isCueBallCollision = bodyA == this.#cueBall.body || bodyB == this.#cueBall.body;
 
         const isCushionColision = this.#isCushionCollision(bodyA, bodyB);
         const redBallInCollision = this.#redBallInCollision(bodyA, bodyB);
@@ -58,6 +58,7 @@ class SnookerCollisionDetector {
           }
         }
 
+        console.log(isCueBallCollision);
         // handles events when a ball is potted
         if (isPocketCollision) {
           if (isCueBallCollision) {
@@ -127,7 +128,6 @@ class PocketCollisionHandler {
   constructor({
     objectBalls,
     cueBall,
-    onDisplayMessage,
   }) {
     this.#objectBalls = objectBalls;
     this.#cueBall = cueBall;

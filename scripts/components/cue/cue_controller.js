@@ -1,7 +1,6 @@
 /** Manages the interaction between a given cue ball and the cue. */
 class CueController {
     #cueBallBody;
-    #cueBallRadius;
     #struckingAreaRadius
     #cue;
     #cueBallVelocityThreshold;
@@ -9,13 +8,12 @@ class CueController {
     constructor(cueBall) {
         // initialize private properties
         this.#cueBallBody = cueBall.body;
-        this.#cueBallRadius = this.#cueBallBody.circleRadius;
 
         // the radius of the striking area in which the cue will be available for use
-        this.#struckingAreaRadius = 300;
+        this.#struckingAreaRadius = this.#cueBallBody.circleRadius * 30;
 
         // create the cue
-        this.#cue = new Cue(this.#struckingAreaRadius, this.#cueBallRadius);
+        this.#cue = new Cue(this.#struckingAreaRadius, this.#cueBallBody.circleRadius);
 
         // set a threshold for the cue ball's velocity to determine if it is not moving
         this.#cueBallVelocityThreshold = 0.01;
@@ -40,16 +38,16 @@ class CueController {
             // the user is only allowed to struck the ball if the cue ball is not moving or at a very low velocity
             const isCueBallNotMoving = Math.abs(this.#cueBallBody.velocity.x) < this.#cueBallVelocityThreshold && Math.abs(this.#cueBallBody.velocity.y) < this.#cueBallVelocityThreshold;
             if (mouseIsPressed && isCueBallNotMoving) {
-                this.#struckBall();
+                this.#strikeBall();
             }
         }
     }
 
-    #struckBall() {
+    #strikeBall() {
         // calculate the force vector in the opposite direction of the mouse
         const forceX = this.#cueBallBody.position.x - mouseX;
         const forceY = this.#cueBallBody.position.y - mouseY;
-        const forceScale = (this.#cueBallRadius * 0.3) / 100000;
+        const forceScale = 0.0002 * this.#cueBallBody.mass;
 
         // apply the force to the cue ball
         Body.applyForce(this.#cueBallBody, this.#cueBallBody.position, { x: forceX * forceScale, y: forceY * forceScale });

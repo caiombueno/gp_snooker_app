@@ -41,14 +41,24 @@ class RandomlyPositionedBallCollectionHelper {
         secondBallCollection,
         playFieldDimensions,
     }) {
-        const firstArrayOfBalls = firstBallCollection.balls;
-        const secondArrayOfBalls = secondBallCollection.balls;
+        const firstBallArray = firstBallCollection.balls;
+        const secondBallArray = secondBallCollection.balls;
 
-        for (let i = 0; i < firstArrayOfBalls.length; i++) {
-            for (let j = 0; j < secondArrayOfBalls.length; j++) {
-                if (firstArrayOfBalls[i].position.x === secondArrayOfBalls[j].position.x && array1[i].position.y === secondArrayOfBalls[j].position.y) {
-                    const newRandomPosition = RandomlyPositionedBallCollectionHelper.#getRandomPositionWithinPlayfield(playFieldDimensions);
-                    firstArrayOfBalls[i].moveTo(newRandomPosition.x, newRandomPosition.y);
+        for (let i = 0; i < firstBallArray.length; i++) {
+            for (let j = 0; j < secondBallArray.length; j++) {
+                if (firstBallArray[i].position.x === secondBallArray[j].position.x && firstBallArray[i].position.y === secondBallArray[j].position.y) {
+                    let newRandomPosition;
+                    let conflictsWithOtherBalls;
+
+                    // this ensures the new random position conflicts with any ball's position
+                    do {
+                        newRandomPosition = RandomlyPositionedBallCollectionHelper.#getRandomPositionWithinPlayfield(playFieldDimensions);
+
+                        conflictsWithOtherBalls = firstBallArray.some(ball => ball.position.x === newRandomPosition.x && ball.position.y === newRandomPosition.y) ||
+                            secondBallArray.some(ball => ball.position.x === newRandomPosition.x && ball.position.y === newRandomPosition.y);
+                    } while (conflictsWithOtherBalls);
+
+                    firstBallArray[i].moveTo(newRandomPosition.x, newRandomPosition.y);
                 }
             }
         }

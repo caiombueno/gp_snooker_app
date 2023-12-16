@@ -1,3 +1,55 @@
+/**
+The components on the physical (matter.js) level are the cushions, pockets, and the balls. All the other visible components are only rendered with no physics engine.
+
+How does cue ball striking works
+
+The cue ball striking functionality operates as follows: when the mouse is clicked, a force is applied in the opposite direction of the mouse, and the force intensity 
+is determined by the distance of the mouse from the cue ball. However, for this to work, the mouse needs to be within the 'striking area' of the ball. 
+The size of this area is determined by the cue controller, and all this implementation is handled by the CueController class.
+
+
+How does the ball potting works
+
+The SnookerCollisionDetector manages collisions among balls, cushions, and pockets. 
+Functionalities for potted balls are overseen by a PocketCollisionHandler instance within the detector. 
+Three ball types in snooker each adhere to specific rules when they fall into a pocket.
+
+
+How does the position mode switching works
+
+The application includes three HTML radio buttons for switching the position mode of the object balls. 
+The entity responsible for monitoring these buttons is the PositionModeController. Whenever the form alters its value, the position mode controller calls 
+a function (passed as a parameter during class instantiation), passing the checked radio button value to it. 
+Additionally, it allows the association of keys with these buttons, enabling the form value to be changed using the keyboard as well.
+
+In our case, when the form's value changes, it removes the cue ball from the table and invokes the Object Ball's changeMode function. 
+This function is responsible for modifying the positioning mode of the object balls.
+
+For each type of ball collection (reds and coloured), we have two classes: one for creating the balls at standard positions and another for creating them at random positions.
+
+When changeMode is called, the code checks the passed position mode and reinstantiates new coloured and red balls with the correct position settings.
+
+How does the ball's random positioning works
+For the 'random reds only' and 'random reds and coloured' modes, a function checks all ball positions. 
+If two or more balls share the same position, one of the balls remains at the same position, while new unique positions are chosen for the other balls 
+that previously occupied that position.
+
+The random algorithm selected to generate random numbers within the table range is the random function from P5.js.
+
+
+Extension
+
+One of the tutors for this module, Pedram, mentioned during a webinar on December 15, 2023, that implementing a good object-oriented (OO) structure 
+and utilizing ES6 syntax in our project could be considered an extension, as it requires knowledge beyond the module that I had to learn myself.
+
+Following these guidelines, I've developed this project, incorporating techniques such as OOP, defensive programming, code reusability, 
+and modularity as best as I could. The goal was to create code that can be easily read by anyone and structured in a way that new features can be added seamlessly.
+ */
+
+
+
+
+
 // module aliases
 const {
   Engine,
@@ -69,7 +121,7 @@ function draw() {
 
 function setupSnookerTable() {
   // define the width and height of the snooker table
-  const snookerTableWidth = 1000;
+  const snookerTableWidth = 500;
   const snookerTableHeight = snookerTableWidth / 2;
 
   // calculate the center coordinates of the canvas

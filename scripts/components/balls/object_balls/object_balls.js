@@ -44,6 +44,7 @@ class ObjectBalls {
 
     /**
      * Change the positioning mode of the object balls.
+     * 
      * The positioning mode determines the initial arrangement of the red and colored balls on the table.
      * 
      * Valid [positionModeId] options include one of mode IDs passed to the constructor:
