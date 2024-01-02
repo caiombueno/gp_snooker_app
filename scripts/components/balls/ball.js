@@ -11,7 +11,7 @@ class Ball {
     }) {
         this.#color = color;
 
-        const options = { restitution: 1.2, friction: 0.001, frictionAir: 0.015, mass: 5 };
+        const options = { restitution: 1.2, friction: 0.001, frictionAir: 0.015, mass: radius };
         // creates the ball
         this.#ball = Bodies.circle(x, y, radius, options);
 

@@ -104,27 +104,21 @@ class Baulk {
         };
     }
 
-    // Check if an object is within the semicircular arc
+    // check if an object is within the semicircular arc
     isObjectWithinArc(objectPosition) {
-        const arcProperties = snookerTable.baulk.arcProperties;
-        // Calculate the distance between the object and the center of the arc
-        const distance = dist(objectPosition.x, objectPosition.y, arcProperties.centerX, arcProperties.centerY);
+        // calculate the distance between the object and the center of the arc
+        const distance = dist(objectPosition.x, objectPosition.y, this.arcProperties.centerX, this.arcProperties.centerY);
 
-        // Check if the distance is within the radius of the arc
-        if (distance <= arcProperties.radius) {
-            // Calculate the angle of the object in relation to the center of the arc
-            const angle = atan2(objectPosition.y - arcProperties.centerY, objectPosition.x - arcProperties.centerX);
+        // check if the distance is within the radius of the arc
+        if (distance <= this.arcProperties.radius) {
+            // calculate the angle of the object in relation to the center of the arc
+            const angle = atan2(objectPosition.y - this.arcProperties.centerY, objectPosition.x - this.arcProperties.centerX);
 
-            // Adjust angles to be positive and within the range of the arc
-            const normalizedAngle = (angle + TWO_PI) % TWO_PI;
-            const normalizedStartAngle = (PI * 0.5 + TWO_PI) % TWO_PI;
-            const normalizedEndAngle = (PI * 1.5 + TWO_PI) % TWO_PI;
-
-            // Check if the normalized angle is within the range of the arc
-            if (normalizedStartAngle < normalizedEndAngle) {
-                return normalizedAngle >= normalizedStartAngle && normalizedAngle <= normalizedEndAngle;
+            // check if the angle is within the range of the arc
+            if (this.#arcStartAngle < this.#arcEndAngle) {
+                return angle >= this.#arcStartAngle && angle <= this.#arcEndAngle;
             } else {
-                return normalizedAngle >= normalizedStartAngle || normalizedAngle <= normalizedEndAngle;
+                return angle >= this.#arcStartAngle || angle <= this.#arcEndAngle;
             }
         }
 
