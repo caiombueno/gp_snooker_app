@@ -10,9 +10,8 @@ class Ball {
         addToWorld = true,
     }) {
         this.#color = color;
-
-        const options = { restitution: 1.2, friction: 0.001, frictionAir: 0.015, mass: radius };
-        // creates the ball
+        const options = { restitution: radius * 0.25, friction: radius * 0.0002, frictionAir: radius * 0.002, mass: radius * 0.75 };
+        // creates the ballx
         this.#ball = Bodies.circle(x, y, radius, options);
 
         // add the ball to the physics world if specified

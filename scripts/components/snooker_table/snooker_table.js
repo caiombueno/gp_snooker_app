@@ -8,7 +8,7 @@ class SnookerTable {
     #pockets;
     #tableCushions;
 
-    #baulk;
+    #d_area;
 
 
     constructor(xPos, yPos, width, height) {
@@ -22,7 +22,7 @@ class SnookerTable {
         const pocketDiameter = (this.#height / 36) * 1.5;
         this.#pockets = new Pockets(xPos, yPos, width, height, pocketDiameter);
 
-        this.#baulk = new Baulk({
+        this.#d_area = new DArea({
             tablePosition: { x: xPos, y: yPos },
             tableDimensions: { width: width, height: height },
             railThickness: this.#railThickness,
@@ -40,7 +40,7 @@ class SnookerTable {
     /** The width of this table. */
     get width() { return this.#width; }
 
-    get baulk() { return this.#baulk; }
+    get dArea() { return this.#d_area; }
 
     /** The play field dimensions of this table. */
     get playFieldDimensions() {
@@ -69,71 +69,9 @@ class SnookerTable {
         rect(this.#xPos, this.#yPos, this.#width, this.#height, 5);
         pop();
 
-        this.#baulk.draw();
+        this.#d_area.draw();
 
         this.#tableCushions.draw();
         this.#pockets.draw();
-    }
-}
-
-class Baulk {
-    #lineXPos;
-    #lineStartYPos;
-    #lineEndYPos;
-    #centerYPos;
-    #whiteArcDiameter;
-    #arcStartAngle;
-    #arcEndAngle;
-    constructor({ tablePosition, tableDimensions, railThickness }) {
-        // Calculates and initializes the propreties of the baulk arc.
-        this.#lineXPos = tablePosition.x + tableDimensions.width * 0.25;
-        this.#lineStartYPos = tablePosition.y + railThickness;
-        this.#lineEndYPos = tablePosition.y + tableDimensions.height - railThickness;
-        this.#centerYPos = tablePosition.y + tableDimensions.height * 0.5
-        this.#whiteArcDiameter = tableDimensions.height * 0.3;
-        this.#arcStartAngle = 0.5 * PI;
-        this.#arcEndAngle = 1.5 * PI;
-    }
-
-    /** The arc's x, y and radius. */
-    get arcProperties() {
-        return {
-            centerX: this.#lineXPos,
-            centerY: this.#centerYPos,
-            radius: this.#whiteArcDiameter / 2,
-        };
-    }
-
-    // check if an object is within the semicircular arc
-    isObjectWithinArc(objectPosition) {
-        // calculate the distance between the object and the center of the arc
-        const distance = dist(objectPosition.x, objectPosition.y, this.arcProperties.centerX, this.arcProperties.centerY);
-
-        // check if the distance is within the radius of the arc
-        if (distance <= this.arcProperties.radius) {
-            // calculate the angle of the object in relation to the center of the arc
-            const angle = atan2(objectPosition.y - this.arcProperties.centerY, objectPosition.x - this.arcProperties.centerX);
-
-            // check if the angle is within the range of the arc
-            if (this.#arcStartAngle < this.#arcEndAngle) {
-                return angle >= this.#arcStartAngle && angle <= this.#arcEndAngle;
-            } else {
-                return angle >= this.#arcStartAngle || angle <= this.#arcEndAngle;
-            }
-        }
-
-        return false;
-    }
-
-    draw() {
-        // draw the vertical line
-        push();
-        stroke(255);
-        line(this.#lineXPos, this.#lineStartYPos, this.#lineXPos, this.#lineEndYPos);
-
-        // draw the arc
-        noFill();
-        arc(this.#lineXPos, this.#centerYPos, this.#whiteArcDiameter, this.#whiteArcDiameter, this.#arcStartAngle, this.#arcEndAngle);
-        pop();
     }
 }

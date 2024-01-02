@@ -58,7 +58,6 @@ class SnookerCollisionDetector {
           }
         }
 
-        console.log(isCueBallCollision);
         // handles events when a ball is potted
         if (isPocketCollision) {
           if (isCueBallCollision) {

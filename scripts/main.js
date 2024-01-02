@@ -121,7 +121,7 @@ function draw() {
 
 function setupSnookerTable() {
   // define the width and height of the snooker table
-  const snookerTableWidth = 500;
+  const snookerTableWidth = 1000;
   const snookerTableHeight = snookerTableWidth / 2;
 
   // calculate the center coordinates of the canvas
@@ -151,7 +151,7 @@ function setupBalls() {
   // create new object balls with the specified parameters
   objectBalls = new ObjectBalls({
     playFieldDimensions: snookerTable.playFieldDimensions,
-    arcProperties: snookerTable.baulk.arcProperties,
+    arcProperties: snookerTable.dArea.arcProperties,
     ballRadius: ballRadius,
     startingPositionsModeId: startingPositionsRadioId,
     randomRedsOnlyModeId: randomRedsOnlyRadioId,
@@ -187,10 +187,10 @@ function mousePressed() {
   // check if the cue ball is out of the table
   if (cueBall.isOutOfTable) {
     // if the mouse is within the play field dimensions, place the cue ball on the table
-    if (snookerTable.baulk.isObjectWithinArc({ x: mouseX, y: mouseY })) {
+    if (snookerTable.dArea.isObjectWithinArc(mouseX, mouseY)) {
       cueBall.placeOnTable();
     } else {
-      displayMessage('The cue ball can only be placed within the baulk arc!');
+      displayMessage('The cue ball can only be placed within the D arc!');
     }
   }
 }
