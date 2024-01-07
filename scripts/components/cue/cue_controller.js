@@ -51,7 +51,9 @@ class CueController {
         // calculate the force vector in the opposite direction of the mouse
         const direction = Matter.Vector.sub(this.#cueBallPos, { x: mouseX, y: mouseY });
 
-        const forceScale = this.#cueBall.body.mass / 3000;
+        const forceScale = this.#cueBallRadius / 1000;
+
+
         const force = Matter.Vector.mult(direction, forceScale);
 
         // apply the force to the cue ball

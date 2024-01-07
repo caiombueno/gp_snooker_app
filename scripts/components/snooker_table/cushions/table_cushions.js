@@ -1,5 +1,5 @@
 /** The cushions for a Snooker table. */
-class Cushions {
+class TableCushions {
     #cushions;
     #cushionThickness;
 
@@ -30,65 +30,63 @@ class Cushions {
         this.#createHorizontalCushions();
 
         this.#createVerticalCushions();
-
-        World.add(engine.world, this.#cushions);
     }
 
-    /** Create and add vertical cushions to the [this.#cushions] array. */
+    /** Create and add vertical cushions to the [#cushions] array. */
     #createVerticalCushions() {
-        const verticalCushionYPos = this.#yPos + (this.#tableHeight / 2);
-        const verticalCushionWidth = this.#tableHeight - (2 * this.#pocketDiameter);
+        const yPos = this.#yPos + (this.#tableHeight / 2);
+        const width = this.#tableHeight - (2 * this.#pocketDiameter);
 
-        const verticalLeftCushion = this.#createNewCushion({
+        const leftCushion = this.#createNewCushion({
             x: this.#xPos + this.#railThickness,
-            y: verticalCushionYPos,
-            width: verticalCushionWidth,
+            y: yPos,
+            width: width,
             angle: HALF_PI,
         });
 
-        const verticalRightCushion = this.#createNewCushion({
+        const rightCushion = this.#createNewCushion({
             x: this.#xPos + this.#tableWidth - this.#railThickness,
-            y: verticalCushionYPos,
-            width: verticalCushionWidth,
+            y: yPos,
+            width: width,
             angle: - HALF_PI,
         });
 
-        this.#cushions.push(verticalLeftCushion, verticalRightCushion);
+        this.#cushions.push(leftCushion, rightCushion);
     }
 
-    /** Create and add horizontal cushions to the [this.#cushions] array. */
+    /** Create and add horizontal cushions to the [#cushions] array. */
     #createHorizontalCushions() {
-        const horizontalLeftXPos = this.#xPos + (this.#tableWidth * 0.25) + (this.#pocketDiameter * 0.25);
-        const horizontalRightXPos = this.#xPos + (this.#tableWidth * 0.75) - (this.#pocketDiameter * 0.25);
-        const horizontalTopYPos = this.#yPos + this.#railThickness;
-        const horizontalBottomYPos = this.#yPos + this.#tableHeight - this.#railThickness;
-        const horizontalTrapezoidWidth = (this.#tableWidth / 2) - (this.#pocketDiameter * 1.5);
+        const leftXPos = this.#xPos + (this.#tableWidth * 0.25) + (this.#pocketDiameter * 0.25);
+        const rightXPos = this.#xPos + (this.#tableWidth * 0.75) - (this.#pocketDiameter * 0.25);
+        const topYPos = this.#yPos + this.#railThickness;
+        const bottomYPos = this.#yPos + this.#tableHeight - this.#railThickness;
+        const width = (this.#tableWidth / 2) - (this.#pocketDiameter * 1.5);
 
         // cushions' bodies
         const topLeftCushion = this.#createNewCushion({
-            x: horizontalLeftXPos,
-            y: horizontalTopYPos,
-            width: horizontalTrapezoidWidth,
+            x: leftXPos,
+            y: topYPos,
+            width: width,
             angle: PI,
         });
 
         const topRightCushion = this.#createNewCushion({
-            x: horizontalRightXPos,
-            y: horizontalTopYPos,
-            width: horizontalTrapezoidWidth,
+            x: rightXPos,
+            y: topYPos,
+            width: width,
             angle: PI,
         });
 
         const bottomLeftCushion = this.#createNewCushion({
-            x: horizontalLeftXPos,
-            y: horizontalBottomYPos,
-            width: horizontalTrapezoidWidth,
+            x: leftXPos,
+            y: bottomYPos,
+            width: width,
         });
 
         const bottomRightCushion = this.#createNewCushion({
-            x: horizontalRightXPos,
-            y: horizontalBottomYPos,
-            width: horizontalTrapezoidWidth,
+            x: rightXPos,
+            y: bottomYPos,
+            width: width,
         });
 
         this.#cushions.push(topLeftCushion, topRightCushion, bottomLeftCushion, bottomRightCushion);
@@ -101,8 +99,13 @@ class Cushions {
         width,
         angle = 0,
     }) {
-        const defaultCushionOptions = { isStatic: true, restitution: 1, friction: 0.001, angle: angle };
-        return Bodies.trapezoid(x, y, width, this.#cushionThickness, 0.08, defaultCushionOptions);
+        return new Cushion({
+            xPos: x,
+            yPos: y,
+            width: width,
+            thickness: this.#cushionThickness,
+            angle: angle,
+        });
     }
 
     /** Retrieve the thickness of the cushions */
@@ -112,7 +115,12 @@ class Cushions {
 
     /** Check if a given body is one of the cushions. */
     isBodyACushion(body) {
-        return this.#cushions.includes(body);
+        for (let i = 0; i < this.#cushions.length; i++) {
+            if (this.#cushions[i].isBodyCushion(body)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Draw the cushions on the canvas. */
@@ -121,9 +129,8 @@ class Cushions {
         fill(52, 100, 32);
         noStroke();
         for (let i = 0; i < this.#cushions.length; i++) {
-            drawVertices(this.#cushions[i].vertices);
+            this.#cushions[i].draw();
         }
         pop();
     }
-
 }

@@ -5,11 +5,11 @@ class SnookerTable {
     #width;
     #height;
     #railThickness;
-    #pockets;
+    #tablePockets;
     #tableCushions;
+    #dArea;
 
-    #d_area;
-
+    #tableRails;
 
     constructor(xPos, yPos, width, height) {
         // initialize private fields
@@ -20,27 +20,36 @@ class SnookerTable {
 
         this.#railThickness = width / 100;
         const pocketDiameter = (this.#height / 36) * 1.5;
-        this.#pockets = new Pockets(xPos, yPos, width, height, pocketDiameter);
+        this.#tablePockets = new TablePockets(xPos, yPos, width, height, pocketDiameter);
 
-        this.#d_area = new DArea({
+        this.#dArea = new DArea({
             tablePosition: { x: xPos, y: yPos },
             tableDimensions: { width: width, height: height },
             railThickness: this.#railThickness,
         });
 
-        this.#tableCushions = new Cushions(xPos, yPos, width, height, this.#railThickness, pocketDiameter);
+        this.#tableCushions = new TableCushions(xPos, yPos, width, height, this.#railThickness, pocketDiameter);
+
+        this.#tableRails = new TableRails({
+            tableXPos: xPos,
+            tableYPos: yPos,
+            tableWidth: width,
+            tableHeight: height,
+            pocketDiameter: pocketDiameter,
+            railThickness: this.#railThickness,
+        });
     }
 
     /** The cushions for this table. */
     get cushions() { return this.#tableCushions; }
 
     /** The pockets for this table. */
-    get pockets() { return this.#pockets; }
+    get pockets() { return this.#tablePockets; }
 
     /** The width of this table. */
     get width() { return this.#width; }
 
-    get dArea() { return this.#d_area; }
+    get dArea() { return this.#dArea; }
 
     /** The play field dimensions of this table. */
     get playFieldDimensions() {
@@ -64,14 +73,16 @@ class SnookerTable {
         // draw the table
         push();
         fill(80, 140, 52);
-        stroke(72, 36, 12);
+        stroke(248, 212, 76);
         strokeWeight(this.#railThickness);
         rect(this.#xPos, this.#yPos, this.#width, this.#height, 5);
         pop();
 
-        this.#d_area.draw();
+
+        this.#dArea.draw();
 
         this.#tableCushions.draw();
-        this.#pockets.draw();
+        this.#tablePockets.draw();
+        this.#tableRails.draw();
     }
 }

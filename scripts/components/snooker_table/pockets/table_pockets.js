@@ -1,5 +1,5 @@
 /** The pockets for a Snooker table. */
-class Pockets {
+class TablePockets {
     #pockets;
     #pocketRadius;
 
@@ -22,19 +22,22 @@ class Pockets {
         const bottomMiddlePocket = this.#createNewPocket(middlePocketXPos, bottomPocketYPos);
 
         this.#pockets = [topLeftPocket, topRightPocket, bottomRightPocket, bottomLeftPocket, topMiddlePocket, bottomMiddlePocket];
-
-        World.add(engine.world, this.#pockets);
     }
 
     /** Creates a new pocket with the given parameters. */
     #createNewPocket(x, y) {
-        const options = { isStatic: true };
-        return Bodies.circle(x, y, this.#pocketRadius, options);
+        return new Pocket(x, y, this.#pocketRadius);
     }
 
     /** Check if a given body is one of the pocket. */
     isBodyAPocket(body) {
-        return this.#pockets.includes(body);
+        for (let i = 0; i < this.#pockets.length; i++) {
+            if (this.#pockets[i].isBodyPocket(body)) {
+                console.log(true);
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Draw the pockets on the canvas. */
@@ -42,7 +45,7 @@ class Pockets {
         push();
         fill(0);
         for (let i = 0; i < this.#pockets.length; i++) {
-            drawVertices(this.#pockets[i].vertices);
+            this.#pockets[i].draw();
         }
         pop();
     }

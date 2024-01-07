@@ -1,5 +1,5 @@
 /**
-The components on the physical (matter.js) level are the cushions, pockets, and the balls. All the other visible components are only rendered with no physics engine.
+The components on the physical (matter.js) level are the cushions, pockets, rails, and the balls. All the other visible components are only rendered with no physics engine.
 
 How does cue ball striking works
 
